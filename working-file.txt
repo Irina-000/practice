@@ -1,125 +1,58 @@
-feature(gui) : создание ф-ции main, чтение чисел из файла
-
 #include <iostream>
 #include <fstream>
-#include <string>
+#include <vector>
 #include <sstream>
+#include <cmath>
+
 using namespace std;
 
-string delete_extra(string st,  int ln);    //удаление запятых из строки
-void st_to_num(double *mass, string st);    // перевод чисел из типа string в тип double
-
-
-int main()
-
+int main() 
 {
-    int count = 0;              //кол-во чисел в файле
-    int i = 0;
-    int len = 0;                //длина строки
-    char er;
-    string num_str;             //строка чисел
 
-    // считывание файла
-    const char* file_name = "C:\\Users\\User\\Desktop\\практика\\просто_тесты\\2.txt";
-    ifstream test (file_name);               
-    // проверка наличия файла
-    if (!test.is_open())
+    ifstream inputFile ("C:\\Users\\User\\Desktop\\практика\\просто_тесты\\1.txt"); //чтение из файла
+    // если не существует этого файла
+    if (!inputFile) 
     {
-        cout << "Error!\n";
-        return -1;
+        //вывод об ошибке
+        cerr << "Error! Not exist!" << endl;
+        return 1;
     }
 
-    double* numbers = new double;       // динамический массив чисел
-    len = 0;                            // длина строки = 0           
 
-    while (!test.eof())
+    string test;
+    getline(inputFile, test);   //перенос всего содержимого в одну строку
+    inputFile.close();          //закрытие файла
+
+    // Удаляем скобки
+    // если первым символом явдяется скобка
+    if (test.front() == '[') 
     {
-        // считывание всех значений в виде строки
-        getline(test, num_str);
-        while (num_str[len] != ']')
-            len++;                      // длина строки
-        
-        // удаление первой скобки в начале
-        if (num_str[0] == '[') 
-        {
-            for (int h = 0; h <= len - 2; h++)
-            {
-                num_str[h] = num_str[h + 1];
-            }
-            len = len - 1;
-            num_str[len] = ']';
-        }
-
-        // удаление всех запятых в строке
-        num_str = delete_extra(num_str, len);
-        // перевод чисел в тип double 
-        st_to_num(numbers, num_str);
+        test.erase(0, 1);
+    }
+    // если последним символом явдяется скобка
+    if (test.back() == ']') 
+    {
+        test.pop_back();
     }
 
-    // новая строка "без всего лишнего"
-    cout << num_str << endl;
+    vector<double> numbers;     // вектор чисел
+    stringstream str(test);     // переменная для перевода строки в набор чисел
+    string number;
 
-    // закрытие файла
-    test.close();
-    delete[] numbers;
-
-    return (0);
-
-}
-
-
-
-string delete_extra(string st, int ln)
-{
-    int pos = 0;
-    // пока не встретится конец строки
-    while (st[pos] != ']')
-    {
-        if ((st[pos] == ',') && (st[pos + 1] == ' '))
-        {
-            // смещение всей строки на 1 символ влево
-            for (int h = pos; h <= ln - 2; h++)
-            {
-                st[h] = st[h + 1];
-            }
-            ln = ln - 1;
-            st[ln] = '\0';
-        }
-        else
-            pos++;
+    while (getline(str, number, ','))       // вычленение чисел из строки, разделённых запятой
+    {                               
+        // добавление нового числа в конец вектора чисел
+        numbers.push_back(stod(number));       
     }
-    cout << st << endl;
-    return st;
-}
 
-
-void st_to_num(double *mass, string st)
-{
-    int pos = 0;        // текщая позиция на строке
-    string ss = "";     // подстрока
-    int beg = 0;        // символ, начиная с которого записывается новое число в подстроку
-    int k = 0;
-
-    while (st[pos] != ']')
+    int len = numbers.size();
+    int i;
+    cout << len << endl;
+    cout << "Считанные числа:" << endl;
+    for (i = 0; i < len; i++) 
     {
-        // как только появляется разделитель между числами
-        if (st[pos] == ' ') 
-        {
-            for (int h = beg; h < pos; h++)
-            {
-                ss = ss + st[h];                // все сиволы числа записываются в одну подстроку
-            }
+        cout << numbers[i] << endl;
+    }
 
-            // перевод числа в вещественный тип
-            mass[k] = stod(ss);
-            ss = "";                            // очищение подстроки
-            cout << mass[k] << endl;
-            k++;                                // продвижение по массиву
-            beg = pos + 1;                      // следущее число начнёт записываться со следующего символа
-            pos++;                              // переход к следующегму символу
-        }
-        else
-            pos++;                              // переход к следующему символу                          
-    }   
+    return 0;
 }
-
