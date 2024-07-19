@@ -6,8 +6,18 @@
 #include <SFML/Graphics.hpp>
 
 using namespace std;
+using namespace sf;
 
-int main() 
+// размеры окна для графика
+const int x_0 = 40;
+const int y_0 = 400;
+const int width = 1200;
+const int height = 600;
+const int kolvo = 200;
+const double discr_per = 5 * pow(10, -9) * pow(10, 9);   // период дискретизации (5)
+
+
+int main()
 {
 
     ifstream inputFile ("C:\\Users\\User\\Desktop\\практика\\просто_тесты\\1.txt"); //чтение из файла
@@ -54,6 +64,68 @@ int main()
     {
         cout << numbers[i] << endl;
     }
+
+
+    RenderWindow window(VideoMode(width, height), "Function graph");
+    // координаты центра
+    int x0 = 35;
+    int y0 = height / 2;
+
+    CircleShape point(3.f);
+    point.setFillColor(Color::Red);
+    CircleShape line(2.f);
+    line.setFillColor(Color::Blue);
+
+    float stepX;      // шаг между двумя значениями
+    float stepY;
+    const int dist = 50;
+
+
+    while (window.isOpen())
+    {
+        Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == Event::Closed)
+                window.close();
+        }
+
+        //координаты плоскости
+        float x, y;
+
+        //позиция относительно центра
+        float x1, y1;
+
+        const double discr_per = 5 * pow(10, -9) * pow(10, 9);   // период дискретизации (5)
+
+
+        window.clear(Color::White);     //очистка экрана
+        for (i = 0; i < count - 1; i++)
+        {
+            //координаты, с которых рисуется линия
+            x = discr_per * i;
+            stepY = (numbers[i + 1] - numbers[i]) * 30 / dist;
+            stepX = discr_per / dist;
+            y = numbers[i] * 30;
+
+            for (int j = 1; j < dist; j++)
+            {
+                //позиция относительно центра
+                x1 = x0 + x + stepX * j;
+                y1 = y0 - y - stepY * j;
+
+                line.setPosition(x1, y1);      // установление позиции
+                window.draw(line);             // рисование точки
+            }
+            x1 = x0 + x;
+            y1 = y0 - y;
+            point.setPosition(x1, y1);      // установление позиции
+            window.draw(point);             // рисование точки
+        }
+        window.display();                   // отображение дисплея
+
+    }
+
 
     return 0;
 }
