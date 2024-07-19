@@ -3,6 +3,7 @@
 #include <vector>
 #include <sstream>
 #include <cmath>
+#include <SFML/Graphics.hpp>
 
 using namespace std;
 
@@ -45,11 +46,11 @@ int main()
         numbers.push_back(stod(number));       
     }
 
-    int len = numbers.size();
+    int count = numbers.size();
     int i;
-    cout << len << endl;
+    cout << count << endl;
     cout << "Считанные числа:" << endl;
-    for (i = 0; i < len; i++) 
+    for (i = 0; i < count; i++) 
     {
         cout << numbers[i] << endl;
     }
