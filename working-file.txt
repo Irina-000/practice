@@ -1,28 +1,34 @@
+
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <sstream>
 #include <cmath>
-#include <SFML/Graphics.hpp>
+#include <windows.h>
+#include "ConWin.h"
+#include <process.h>
 
-using namespace std;
-using namespace sf;
+
+    using namespace std;
+extern HDC hdc; // объявим  контекст устройства
+
+HDC hdc;	// Объявим контекст устройства
+            // Контекст устройства по сути это структура,
+            // содержащая описание видеокарты на вашем компьютере
+            // и всех необходимых графических элементов
+
+
 
 // размеры окна для графика
-const int x_0 = 40;
-const int y_0 = 400;
-const int width = 1200;
-const int height = 600;
 const int kolvo = 200;
 const double discr_per = 5 * pow(10, -9) * pow(10, 9);   // период дискретизации (5)
 
-
-int main()
+int main(int argc, const char* argv[])
 {
 
-    ifstream inputFile ("C:\\Users\\User\\Desktop\\практика\\просто_тесты\\1.txt"); //чтение из файла
+    ifstream inputFile("C:\\Users\\User\\Desktop\\практика\\просто_тесты\\1.txt"); //чтение из файла
     // если не существует этого файла
-    if (!inputFile) 
+    if (!inputFile)
     {
         //вывод об ошибке
         cerr << "Error! Not exist!" << endl;
@@ -36,12 +42,12 @@ int main()
 
     // Удаляем скобки
     // если первым символом явдяется скобка
-    if (test.front() == '[') 
+    if (test.front() == '[')
     {
         test.erase(0, 1);
     }
     // если последним символом явдяется скобка
-    if (test.back() == ']') 
+    if (test.back() == ']')
     {
         test.pop_back();
     }
@@ -51,81 +57,81 @@ int main()
     string number;
 
     while (getline(str, number, ','))       // вычленение чисел из строки, разделённых запятой
-    {                               
+    {
         // добавление нового числа в конец вектора чисел
-        numbers.push_back(stod(number));       
+        numbers.push_back(stod(number));
     }
 
     int count = numbers.size();
-    int i;
+    int i, j;
     cout << count << endl;
-    cout << "Считанные числа:" << endl;
-    for (i = 0; i < count; i++) 
+    cout << "Numbers:" << endl;
+    for (i = 0; i < count; i++)
     {
         cout << numbers[i] << endl;
     }
+    //for (i = 0; i < 45; i++)
+    //{
+    //    cout << endl;
+    //}
 
 
-    RenderWindow window(VideoMode(width, height), "Function graph");
-    // координаты центра
-    int x0 = 35;
-    int y0 = height / 2;
+    //получим дескриптор консольного окна
+    HWND hwnd = GetConcolWindow();
 
-    CircleShape point(3.f);
-    point.setFillColor(Color::Red);
-    CircleShape line(2.f);
-    line.setFillColor(Color::Blue);
-
-    float stepX;      // шаг между двумя значениями
-    float stepY;
-    const int dist = 50;
-
-
-    while (window.isOpen())
+    //если дескриптор существует
+    if (hwnd != NULL)
     {
-        Event event;
-        while (window.pollEvent(event))
+        //получим контекст устройства для консольного окна
+        hdc = GetWindowDC(hwnd);
+
+        //если контекст существует - можем работать
+        if (hdc != 0)
         {
-            if (event.type == Event::Closed)
-                window.close();
-        }
+            int colR = 255;
+            int colG = 0;
+            int colB = 0;
+            double x0 = 40;
+            double y0 = 500;
 
-        //координаты плоскости
-        float x, y;
+            POINT coordX[2];
+            POINT coordY[2];
+            coordX[0].x = x0;
+            coordX[0].y = y0;
+            coordX[1].x = x0 + 1200;
+            coordX[1].y = y0;
 
-        //позиция относительно центра
-        float x1, y1;
+            coordY[0].x = x0;
+            coordY[0].y = y0 + 300;
+            coordY[1].x = x0;
+            coordY[1].y = y0 - 400;
 
-        const double discr_per = 5 * pow(10, -9) * pow(10, 9);   // период дискретизации (5)
+            Polyline(hdc, coordX, 2);
+            Polyline(hdc, coordY, 2);
+
+            HPEN Pen = CreatePen(PS_SOLID, 3, RGB(colR, colG, colB));
+            SelectObject(hdc, Pen);
+            HBRUSH hBrush = CreateSolidBrush(RGB(colR, colG, colB));
+            SelectObject(hdc, hBrush);
 
 
-        window.clear(Color::White);     //очистка экрана
-        for (i = 0; i < count - 1; i++)
-        {
-            //координаты, с которых рисуется линия
-            x = discr_per * i;
-            stepY = (numbers[i + 1] - numbers[i]) * 30 / dist;
-            stepX = discr_per / dist;
-            y = numbers[i] * 30;
-
-            for (int j = 1; j < dist; j++)
+            POINT poly[2];
+            for (int i = 0; i < count - 1; i++)
             {
-                //позиция относительно центра
-                x1 = x0 + x + stepX * j;
-                y1 = y0 - y - stepY * j;
+                poly[0].x = x0 + discr_per * i;
+                poly[0].y = y0 - (numbers[i] * 30);
 
-                line.setPosition(x1, y1);      // установление позиции
-                window.draw(line);             // рисование точки
+                poly[1].x = x0 + discr_per * (i + 1);
+                poly[1].y = y0 - (numbers[i + 1] * 30);
+
+                Polyline(hdc, poly, 2);
             }
-            x1 = x0 + x;
-            y1 = y0 - y;
-            point.setPosition(x1, y1);      // установление позиции
-            window.draw(point);             // рисование точки
-        }
-        window.display();                   // отображение дисплея
 
-    }
+        }
+    }//end if
+
 
 
     return 0;
 }
+
