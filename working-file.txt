@@ -26,7 +26,7 @@ const int k = 30;
 int main(int argc, const char* argv[])
 {
 
-    ifstream inputFile("C:\\Users\\User\\Desktop\\практика\\просто_тесты\\2.txt"); //чтение из файла
+    ifstream inputFile("C:\\Users\\User\\Desktop\\практика\\просто_тесты\\1.txt"); //чтение из файла
     // если не существует этого файла
     if (!inputFile)
     {
@@ -66,18 +66,23 @@ int main(int argc, const char* argv[])
     int i, j;
     cout << count << endl;
     cout << "Numbers:" << endl;
-    //for (i = 0; i < count; i++)
-        //{
-        //    cout << i << "\t" << numbers[i] << endl;
-        //}
-        //for (i = 0; i < 45; i++)
-        //{
-        //    cout << endl;
-        //}
+    for (i = 0; i < count; i++)
+    {
+        //cout << i << "\t" << numbers[i] << endl;
+        numbers[i] = numbers[i] * k;
+    }
+    //for (i = 0; i < 10; i++)
+    //{
+    //    cout << i << "\t" << numbers[i] << endl;
+    //}
+    //for (i = 0; i < 45; i++)
+    //{
+    //    cout << endl;
+    //}
 
 
-        //получим дескриптор консольного окна
-        HWND hwnd = GetConcolWindow();
+    //получим дескриптор консольного окна
+    HWND hwnd = GetConcolWindow();
 
     //если дескриптор существует
     if (hwnd != NULL)
@@ -91,7 +96,7 @@ int main(int argc, const char* argv[])
             int colR = 255;
             int colG = 0;
             int colB = 0;
-            double x0 = 400;
+            double x0 = 350;
             double y0 = 370;
             int rad = 5;
 
@@ -120,18 +125,23 @@ int main(int argc, const char* argv[])
             for (int i = 0; i < count - 1; i++)
             {
                 poly[0].x = x0 + discr_per * i;
-                poly[0].y = y0 - (numbers[i] * k);
+                poly[0].y = y0 - (numbers[i] );
 
                 poly[1].x = x0 + discr_per * (i + 1);
-                poly[1].y = y0 - (numbers[i + 1] * k);
+                poly[1].y = y0 - (numbers[i + 1] );
 
                 Polyline(hdc, poly, 2);
             }
 
-
+            cout << "OK_1" << endl;
+            for (i = 0; i < 15; i++)
+            {
+                cout << endl;
+            }
 
             int Ua = 0;                 // индекс амплитуды сигнала
             double Ua_num;              // амплитуда сигнала
+            int U_a = 0;                 // индекс амплитуды сигнала
             int max_ind = 0;
             int max_Ua = 0;
             int beg_front = 0;
@@ -158,37 +168,41 @@ int main(int argc, const char* argv[])
             // минимальная амплитуда
             // конец среза
 
-            double pog = 0.1;               // допустимая разница
+            vector<double> pg[20];         // вектор максимальных отклонений
+
+
+
+            double pog = 2.5;               // допустимая разница
             double max_num = pow(1, -6);
             double min_num = 1000;
             double dif = 1000;
 
-            //// поиск периода
-            //for (i = 3; i < count - 3; i++)
-            //{
-            //    if ((numbers[0] == numbers[i]) &&
-            //        (numbers[1] == numbers[i + 1]) &&
-            //        (numbers[2] == numbers[i + 2]))
-            //    {
-            //        beg_per = i;
-            //    }       
-            //}
-            //cout << "beg of period\n" << beg_per << "\t" << numbers[beg_per] << endl;
 
             hdc = GetWindowDC(hwnd);
             hBrush = CreateSolidBrush(RGB(0, 0, 255));
             SelectObject(hdc, hBrush);
             // нахождение начала фронта
             i = 0;
-            while ((abs(abs(numbers[i]) - abs(numbers[i + 1])) < pog) && (i < count - 1))
+            double d = 0;
+
+            for (i = 0; i < count/2 - 1; i++)
             {
-                //cout << abs(abs(numbers[i]) - abs(numbers[i+1])) << endl;
+                if (abs(abs(numbers[i]) - abs(numbers[i + 1])) > d)
+                    d = abs(abs(numbers[i]) - abs(numbers[i + 1]));
+                //cout << i << "\t" << abs(abs(numbers[i]) - abs(numbers[i + 1])) << endl;
+            }
+            cout << d << endl;
+
+            i = 0;
+            while ((abs(abs(numbers[i]) - abs(numbers[i + 1])) < pog) && (i < count/2 - 1))
+            {
+                //cout << i << "\t" << abs(abs(numbers[i]) - abs(numbers[i + 1])) << endl;
                 i++;
             }
             beg_front = i;
             cout << "beg of front\n" << beg_front << "\t" << numbers[beg_front] << "\t" << numbers[beg_front + 1] << endl;
             i++;
-            Ellipse(hdc, x0 + discr_per * beg_front - rad, y0 - numbers[beg_front] * k - rad, x0 + discr_per * beg_front + rad, y0 - numbers[beg_front] * k + rad);
+            Ellipse(hdc, x0 + discr_per * beg_front - rad, y0 - numbers[beg_front] - rad, x0 + discr_per * beg_front + rad, y0 - numbers[beg_front] + rad);
 
 
             // нахождение максимальной амплитуды
@@ -199,13 +213,13 @@ int main(int argc, const char* argv[])
             max_ind = i;
             cout << "max index\n" << max_ind << "\t" << numbers[max_ind] << endl;
             i++;
-            Ellipse(hdc, x0 + discr_per * max_ind - rad, y0 - numbers[max_ind] * k + rad, x0 + discr_per * max_ind + rad, y0 - numbers[max_ind] * k - rad);
+            Ellipse(hdc, x0 + discr_per * max_ind - rad, y0 - numbers[max_ind] + rad, x0 + discr_per * max_ind + rad, y0 - numbers[max_ind] - rad);
 
 
             // проверка на наличие выброса
             if (((numbers[max_ind] - numbers[max_ind + 1]) < pog) &&
-                ((numbers[max_ind + 1] - numbers[max_ind + 2]) < pog) &&
-                ((numbers[max_ind + 2] - numbers[max_ind + 3]) < pog))
+                ((numbers[max_ind+1] - numbers[max_ind + 2]) < pog) &&
+                ((numbers[max_ind+2] - numbers[max_ind + 3]) < pog))
             {
                 // если последующие значения справа от макс отличаются незначительно
                 // то макс значение - просто амплитуда
@@ -232,127 +246,176 @@ int main(int argc, const char* argv[])
 
             // если был выброс, то теперь нужно найти амплитуду
             // для этого найдем начало среза
-            i = max_ind;
-            while ((abs(abs(numbers[i]) - abs(numbers[i + 1])) > pog) ||
-                (abs(abs(numbers[i + 1]) - abs(numbers[i + 2])) > pog) ||
-                (abs(abs(numbers[i + 2]) - abs(numbers[i + 3])) > pog))
+            i = max_ind+1;
+            bool top = false;
+            int cc = 0;
+            pog = 1;
+            do
             {
+                for (int j = 0; j < 30; j++)
+                {
+                    if (abs(abs(numbers[i + j]) - abs(numbers[i + j + 1])) < pog)
+                    {
+                        cc++;
+                    }
+                }
+                if (cc == 30)
+                {
+                    top = true;
+                }
                 i++;
-            }
+                cc = 0;
+
+            } while (!top);
             // начало плоcкой вершины
             beg_top = i;
             cout << "beg of top\n" << beg_top << "\t" << numbers[beg_top] << endl;
-            Ellipse(hdc, x0 + discr_per * beg_top - rad, y0 - numbers[beg_top] * k - rad, x0 + discr_per * beg_top + rad, y0 - numbers[beg_top] * k + rad);
+            Ellipse(hdc, x0 + discr_per * beg_top - rad, y0 - numbers[beg_top] - rad, x0 + discr_per * beg_top + rad, y0 - numbers[beg_top] + rad);
             i = 0;
 
-
-
-            // поиск ещё одного большого значения
-            for (i = beg_top + 1; i < count - 1; i++)
-            {
-                if (numbers[i] > max_num)
-                {
-                    max_num = numbers[i];
-                    max_num_back = i;
-                }
-            }
-            if (abs(max_num_back - max_num) < pog)
-            {
-                cout << "max num_back index\n" << max_num_back << "\t" << numbers[max_num_back] << endl;
-                Ellipse(hdc, x0 + discr_per * max_num_back - rad, y0 - numbers[max_num_back] * k - rad, x0 + discr_per * max_num_back + rad, y0 - numbers[max_num_back] * k + rad);
-                period = max_num_back - max_ind;
-                cout << "period:\n" << period << "\t" << numbers[period - 1] << "   " << numbers[period] << "   " << numbers[period + 1] << endl;
-                Ellipse(hdc, x0 + discr_per * period - rad, y0 - numbers[period] * k - rad, x0 + discr_per * period + rad, y0 - numbers[period] * k + rad);
-            }
-            else
-            {
-                cout << "there is no period" << endl;
-                period = count - 1;
-            }
+            pog = 18;
+            //// поиск ещё одного большого значения
+            //for (i = beg_top+1; i < count-1; i++)
+            //{
+            //    if (numbers[i] > max_num)
+            //    {
+            //        max_num = numbers[i];
+            //        max_num_back = i;
+            //    }
+            //}
+            //if (abs(max_num_back - max_num) < pog)
+            //{
+            //    cout << "max num_back index\n" << max_num_back << "\t" << numbers[max_num_back] << endl;
+            //    Ellipse(hdc, x0 + discr_per * max_num_back - rad, y0 - numbers[max_num_back] - rad, x0 + discr_per * max_num_back + rad, y0 - numbers[max_num_back]  + rad);
+            //    period = max_num_back - max_ind;
+            //    cout << "period:\n" << period << "\t" << numbers[period - 1] << "   " << numbers[period] << "   " << numbers[period + 1] << endl;
+            //    Ellipse(hdc, x0 + discr_per * period - rad, y0 - numbers[period] - rad, x0 + discr_per * period + rad, y0 - numbers[period] + rad);
+            //}
+            //else
+            //{
+            //    cout << "there is no period" << endl;
+            //    period = count - 1;
+            //}
 
 
             i = beg_top;
             while ((abs(abs(numbers[i]) - abs(numbers[i + 1])) < pog) && (i < count - 1))
             {
+                //cout << abs(abs(numbers[i]) - abs(numbers[i + 1])) << endl;
                 i++;
             }
             // конец плоской вершины => следующее значение - начало среза
             end_top = i;
-            cout << "end of top\n" << end_top << "\t" << numbers[end_top] << endl;
+            cout << "end of top\n" << end_top << "\t" << numbers[end_top] << "\t" << numbers[end_top+1] << endl;
             i++;
-            Ellipse(hdc, x0 + discr_per * end_top - rad, y0 - numbers[end_top] * k - rad, x0 + discr_per * end_top + rad, y0 - numbers[end_top] * k + rad);
+            Ellipse(hdc, x0 + discr_per * end_top - rad, y0 - numbers[end_top]  - rad, x0 + discr_per * end_top + rad, y0 - numbers[end_top]  + rad);
 
             beg_cut = i;
             cout << "beg of cut\n" << beg_cut << "\t" << numbers[beg_cut] << endl;
-            Ellipse(hdc, x0 + discr_per * beg_cut - rad, y0 - numbers[beg_cut] * k - rad, x0 + discr_per * beg_cut + rad, y0 - numbers[beg_cut] * k + rad);
+            Ellipse(hdc, x0 + discr_per * beg_cut - rad, y0 - numbers[beg_cut]  - rad, x0 + discr_per * beg_cut + rad, y0 - numbers[beg_cut]  + rad);
 
 
-            // нахождение минимальной амплитуды
-            for (i = beg_cut; i < period; i++)
-            {
-                if (numbers[i] < min_num)
-                {
-                    min_ind = i;
-                    min_num = numbers[i];
-                }
-            }
-            cout << "min index\n" << min_ind << "\t" << numbers[min_ind] << endl;
-            i++;
-            Ellipse(hdc, x0 + discr_per * min_ind - rad, y0 - numbers[min_ind] * k + rad, x0 + discr_per * min_ind + rad, y0 - numbers[min_ind] * k - rad);
-
-            i = beg_cut;
-            while (abs(numbers[i]) > 0.1)
-            {
-                i++;
-            }
-            end_cut = i;
-            cout << "end_cut\n" << end_cut << "\t" << numbers[end_cut] << endl;
-            i++;
-            Ellipse(hdc, x0 + discr_per * end_cut - rad, y0 - numbers[end_cut] * k + rad, x0 + discr_per * end_cut + rad, y0 - numbers[end_cut] * k - rad);
-
-            i = min_ind;
-            while ((abs(abs(numbers[i]) - abs(numbers[i + 1])) > pog) ||
-                (abs(abs(numbers[i + 1]) - abs(numbers[i + 2])) > pog) ||
-                (abs(abs(numbers[i + 2]) - abs(numbers[i + 3])) > pog))
-            {
-                i++;
-            }
-            // начало плоcкой вершины
-            beg_field = i;
-            cout << "beg of field\n" << beg_field << "\t" << numbers[beg_field] << endl;
-            Ellipse(hdc, x0 + discr_per * beg_field - rad, y0 - numbers[beg_field] * k - rad, x0 + discr_per * beg_field + rad, y0 - numbers[beg_field] * k + rad);
-            i = 0;
 
 
-            ////i = 0;
-            ////while ((abs(abs(numbers[i]) - abs(numbers[i])) < pog) && (i < count - 1))
+            //// нахождение минимальной амплитуды
+            //for (i = beg_cut; i < period; i++)
+            //{
+            //    if (numbers[i] < min_num)
+            //    {
+            //        min_ind = i;
+            //        min_num = numbers[i];
+            //    }
+            //}
+            //cout << "min index\n" << min_ind << "\t" << numbers[min_ind] << endl;
+            //i++;
+            //Ellipse(hdc, x0 + discr_per * min_ind - rad, y0 - numbers[min_ind] * k + rad, x0 + discr_per * min_ind + rad, y0 - numbers[min_ind] * k - rad);
+
+            //// проверка на наличие отрицательного выброса
+            //if (((numbers[min_ind] - numbers[min_ind + 1]) < pog) &&
+            //    ((numbers[min_ind + 1] - numbers[min_ind + 2]) < pog) &&
+            //    ((numbers[min_ind + 2] - numbers[min_ind + 3]) < pog))
+            //{
+            //    // если последующие значения справа от макс отличаются незначительно
+            //    // то макс значение - просто амплитуда
+            //    U_a = min_ind;
+            //}
+            //else
+            //{
+            //    // иначе - макс значение - это выброс
+            //    min_ind = count - 1;
+            //}
+            //// у нас теперь есть либо амплитуда, либо выброс
+
+            //// если был выброс
+            //if (U_a == 0)
+            //{
+            //    cout << "there is an min outlier" << endl;
+            //}
+
+
+            //for (i = beg_cut; i < min_ind; i++)
+            //{
+            //    if (abs(0 - numbers[i]) < dif)
+            //    {
+            //        dif = abs(0 - numbers[i]);
+            //        end_cut = i;
+            //    }
+            //}
+            ////i = beg_cut;
+            ////while (abs(numbers[i]) > 0.1)
             ////{
             ////    i++;
             ////}
-            ////beg_front = i;
-            ////cout << "beg of front\n" << beg_front << "\t" << numbers[beg_front] << endl;
-            ////i++;
+            ////end_cut = i;
+            //cout << "end_cut\n" << end_cut << "\t" << numbers[end_cut] << endl;
+            //i++;
+            //Ellipse(hdc, x0 + discr_per * end_cut - rad, y0 - numbers[end_cut] * k + rad, x0 + discr_per * end_cut + rad, y0 - numbers[end_cut] * k - rad);
 
-            //double part_01 = Ua_num * 0.1;
-            //double part_09 = Ua_num * 0.9;
-            //int r = 0;
-            //int t_f_c = 0;
-            //while (numbers[r] < part_01)
+
+
+            //i = min_ind+1;
+            //while ((abs(abs(numbers[i]) - abs(numbers[i + 1])) > pog) ||
+            //    (abs(abs(numbers[i + 1]) - abs(numbers[i + 2])) > pog) ||
+            //    (abs(abs(numbers[i + 2]) - abs(numbers[i + 3])) > pog))
             //{
-            //    r++;
+            //    i++;
             //}
-            //while ((numbers[r] >= part_01) && (numbers[r] <= part_09) && (r < count - 1))
-            //{
-            //    time_front = time_front + discr_per;
-            //    t_f_c++;
-            //    r++;
-            //}
-            //cout << "time of front\n" << r << "\t" << t_f_c << "\t" << time_front << endl;
+            //// начало плоcкой вершины
+            //beg_field = i;
+            //cout << "beg of field\n" << beg_field << "\t" << numbers[beg_field] << endl;
+            //Ellipse(hdc, x0 + discr_per * beg_field - rad, y0 - numbers[beg_field] * k - rad, x0 + discr_per * beg_field + rad, y0 - numbers[beg_field] * k + rad);
+            //i = 0;
+
+
+            //////i = 0;
+            //////while ((abs(abs(numbers[i]) - abs(numbers[i])) < pog) && (i < count - 1))
+            //////{
+            //////    i++;
+            //////}
+            //////beg_front = i;
+            //////cout << "beg of front\n" << beg_front << "\t" << numbers[beg_front] << endl;
+            //////i++;
+
+            ////double part_01 = Ua_num * 0.1;
+            ////double part_09 = Ua_num * 0.9;
+            ////int r = 0;
+            ////int t_f_c = 0;
+            ////while (numbers[r] < part_01)
+            ////{
+            ////    r++;
+            ////}
+            ////while ((numbers[r] >= part_01) && (numbers[r] <= part_09) && (r < count - 1))
+            ////{
+            ////    time_front = time_front + discr_per;
+            ////    t_f_c++;
+            ////    r++;
+            ////}
+            ////cout << "time of front\n" << r << "\t" << t_f_c << "\t" << time_front << endl;
 
         }
     }//end if
 
-
+  
 
 
 
