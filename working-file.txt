@@ -20,9 +20,6 @@ HDC hdc;	// Объявим контекст устройства
 
 
 
-// размеры окна для графика
-const int kolvo = 200;
-
 int main(int argc, const char* argv[])
 {
 
@@ -35,6 +32,8 @@ int main(int argc, const char* argv[])
     int ord;
     string ch_ord;
 
+
+    // выбор типа файла
     cout << "choose type of file:\njust tests -j\n" << "without blowout -o \nwith blowout -w\n";
     cin >> type;
     while ((type != "-j") && (type != "-o") && (type != "-w"))
@@ -43,6 +42,8 @@ int main(int argc, const char* argv[])
         cin >> type;
     }
 
+
+    // выбор номера файла
     cout << "enter number of file:";
     if (type == "-j")
     {
@@ -70,6 +71,7 @@ int main(int argc, const char* argv[])
     ch_ord = to_string(ord);
 
     string filename;
+    // создание имени файла
     filename = "C:\\Users\\User\\Desktop\\практика\\";
     if (type == "-j")
     {
@@ -83,11 +85,11 @@ int main(int argc, const char* argv[])
     {
         filename = filename + "импульсы_без_выбросов\\" + ch_ord + ".txt";
     }
-    cout << filename << endl;
+    //cout << filename << endl;
+
+
 
     ifstream inputFile(filename);
-    //ifstream inputFile("C:\\Users\\User\\Desktop\\практика\\просто_тесты\\3.txt"); //чтение из файла
-    //ifstream inputFile("C:\\Users\\User\\Desktop\\практика\\импульсы_с_выбросами\\1.txt"); //чтение из файла
     // если не существует этого файла
     if (!inputFile)
     {
@@ -113,8 +115,8 @@ int main(int argc, const char* argv[])
         test.pop_back();
     }
 
-    vector<double> num;                         // вектор истинных чисел
-    vector<double> numbers;                     // вектор удобных чисел
+    vector<double> num;                         // вектор удобных чисел
+    vector<double> numbers;                     // вектор истинных чисел
     stringstream str(test);                     // переменная для перевода строки в набор чисел
     string number;
 
@@ -127,32 +129,34 @@ int main(int argc, const char* argv[])
     int count = numbers.size();
     int i, j;
     double discr_per;
-    int k, pop;
+    int k;
+
+    // если взят файл, в котором чисел немного
     if (type == "-j")
     {
         discr_per = 5 * pow(10, -9) * pow(10, 9);   // период дискретизации (5)
         k = 30;
     }
+
+    // если чисел много и они очень маленькие
     else if (type == "-w")
     {
         discr_per = 5 * pow(10, -9) * pow(10, 8);   // период дискретизации (5)
         k = 7000;
     }
+
+    // если просто чисел много 
     else 
     {
         discr_per = 5 * pow(10, -9) * pow(10, 8);   // период дискретизации (5)
         k = 30;
     }
 
-    cout << count << endl;
-    cout << "Numbers:" << endl;
+
+    // удобные числа для рисовани графика
     for (i = 0; i < count; i++)
     {
         num.push_back(numbers[i] * k);
-    }
-    for (i = 10; i < 20; i++)
-    {
-        //cout << i << "\t" << num[i] << "\t" << numbers[i] << endl;
     }
 
 
@@ -175,13 +179,17 @@ int main(int argc, const char* argv[])
         //если контекст существует - можем работать
         if (hdc != 0)
         {
-            int colR = 255;
-            int colG = 0;
-            int colB = 0;
+            // начальные координаты, с которых будет рисоваться график
             double x0 = 400;
-            double y0 = 430;
-            int rad = 5;
+            double y0 = 480;
+            int rad = 5;        // радиус точек
 
+            for (int g = 0; g < 7; g++)
+            {
+                cout << endl;
+            }
+
+            // оси координат
             POINT coordX[2];
             POINT coordY[2];
             coordX[0].x = x0;
@@ -197,12 +205,13 @@ int main(int argc, const char* argv[])
             Polyline(hdc, coordX, 2);
             Polyline(hdc, coordY, 2);
 
-            HPEN Pen = CreatePen(PS_SOLID, 3, RGB(colR, colG, colB));
+            HPEN Pen = CreatePen(PS_SOLID, 3, RGB(255,0,0));
             SelectObject(hdc, Pen);
-            HBRUSH hBrush = CreateSolidBrush(RGB(colR, colG, colB));
+            HBRUSH hBrush = CreateSolidBrush(RGB(255, 0, 0));
             SelectObject(hdc, hBrush);
 
 
+            // рисование линий, соединяющих точки
             POINT poly[2];
             for (int i = 0; i < count - 1; i++)
             {
@@ -215,23 +224,19 @@ int main(int argc, const char* argv[])
                 Polyline(hdc, poly, 2);
             }
 
-            ////cout << "OK_1" << endl;
-            //for (i = 0; i < 15; i++)
-            //{
-            //    cout << endl;
-            //}
 
-            discr_per = 5 * pow(10,-1);      // период дискретизации (5)
-            double d_per = 5 * pow(10, 0);   // период дискретизации (5)
+            // изменение значений шага дискретизайии для удобства рисования графика и вычисления дальнейших значений
+            discr_per = 5 * pow(10,-1);          // период дискретизации (0.5)
+            double d_per = 5 * pow(10, 0);   
             if (type == "-w")
             {
                 d_per = 5 * pow(10, -1);
-                discr_per = 5 * pow(10, -4);     // период дискретизации (5)
+                discr_per = 5 * pow(10, -4);     // период дискретизации (0.0005)
             }
             else if (type == "-o")
             {
                 d_per = 5 * pow(10, -1);
-                discr_per = 5 * pow(10, -2);     // период дискретизации (5)
+                discr_per = 5 * pow(10, -2);     // период дискретизации (0.05)
             }
 
 
@@ -251,28 +256,28 @@ int main(int argc, const char* argv[])
             int end_top = 0;            // конец плоской вершины
             int beg_cut = 0;            // начало среза
             int end_cut = 0;            // начало среза
-            int beg_per = 0;            // начало периода
             int min_ind = 0;            // индекс мин ампл
             int beg_field = 0;          // начало стабильности значений после мин ампл
             double min_Ua = 0;          // значение мин ампл
-            int max_num_back = 0;       // макс ампл в следуещем периоде
-            int period;                 // индекс периода
-            int Un = 0;                 // ампл помехи
-            int U_n = 0;
-            bool blowout = false;
+            int Un = 0;                 // ампл помехи (наибольшей после min)
+            int U_n = 0;                // ампл помехи (наименьшей после max)
+            bool blowout = false;       // наличие выброса
 
 
+
+
+            // порядок вычисления параметров
+            // 
             // начало фронта
-            // макс амплитуда
-            // начало плоской вершины
-            // период
             // минимальная амплитуда
-            // начало среза
+            // макс амплитуда
+            // проверка на наличие выброса
+            // начало или конец среза
             // начало плоской вершины
             // конец вершины
             // поле
-            // проверка на наличие выброса
-            // амплитуда помехи
+
+
 
             int mas = count / 100;              // масштаб вычислений
             if (type == "-w")
@@ -283,17 +288,19 @@ int main(int argc, const char* argv[])
             {
                 mas = mas / 2;
             }
-            double ave;                         // среднее значение разниц чисел
-            double sum = 0;                     // сумма разниц
+
+
+            double ave = 0;                      // среднее значение чисел
             bool check;
+            double too_m = 0;                    // разница между вершиной и срезом
 
 
+            // мин и макс числа для сравнений
             double max_num = pow(100, 2) * (-1);
             double min_num = 1000;
 
-            double r_floor = tan(10 * M_PI / 180);
-            //cout << "fault = " << r_floor << endl;
-            double l_floor = abs(tan(170 * M_PI / 180));
+
+            double floor = tan(10 * M_PI / 180);;
             int cc;
             double ang_k;
 
@@ -308,10 +315,11 @@ int main(int argc, const char* argv[])
             // нахождение начала фронта
             check = false;
             i = 0;
+            // пока коэф наклона между двумя точками меньше tg10, будем продвигаться по графику
             do
             { 
                 ang_k = (abs((numbers[i]) - (numbers[i + mas]))) / (discr_per * mas);
-                if (ang_k > r_floor)
+                if (ang_k > floor)
                 {
                     check = true;
                 }
@@ -320,13 +328,11 @@ int main(int argc, const char* argv[])
             } while (!check);
             beg_front = i;
             Ellipse(hdc, x0 + d_per * beg_front - rad, y0 - num[beg_front] - rad, x0 + d_per * beg_front + rad, y0 - num[beg_front] + rad);
-            //cout << "beg of front\n" << beg_front << "\t" << numbers[beg_front] << "\t" << numbers[beg_front + 1] << endl;
+            
 
 
-
-
-            i = beg_front + 1;
             //// нахождение минимальной амплитуды
+            i = beg_front + 1;
             for (i = beg_front + 1; i < count - 1; i++)
             {
                 if (num[i] < min_num)
@@ -339,10 +345,8 @@ int main(int argc, const char* argv[])
             min_num = pow(10, 6);
 
 
-
-
-            i = beg_front + 1;;
             // нахождение максимальной амплитуды
+            i = beg_front + 1;;
             for (i = beg_front + 1; i < min_ind - 1; i++)
             {
                 if (num[i] > max_num)
@@ -355,10 +359,9 @@ int main(int argc, const char* argv[])
             
             
             
-            
             // проверка на наличие выброса
             // если нет выброса
-            if  (abs(abs(numbers[max_ind]) - abs(numbers[max_ind + mas])) / (discr_per * mas) < l_floor)
+            if  (abs(abs(numbers[max_ind]) - abs(numbers[max_ind + mas])) / (discr_per * mas) < floor)
             {
                 Ua = max_ind;
                 Ua_num = numbers[max_ind];
@@ -370,39 +373,14 @@ int main(int argc, const char* argv[])
                 blowout = true;
                 cout << "there is a max outlier" << endl;
                 Ellipse(hdc, x0 + d_per * max_ind - rad, y0 - num[max_ind] + rad, x0 + d_per * max_ind + rad, y0 - num[max_ind] - rad);
-                //cout << "max index\n" << max_ind << "\t" << numbers[max_ind] << endl;
             }
 
 
-//            //// поиск ещё одного большого значения
-//            for (i = beg_top + 1; i < count - 1; i++)
-//            {
-//                if (num[i] > max_num)
-//                {
-//                    max_num = num[i];
-//                    max_num_back = i;
-//                }
-//            }
-//            if (abs(abs(num[max_ind]) - abs(num[max_num_back])) < 0.1)
-//            {
-//                cout << "max num_back index\n" << max_num_back << "\t" << num[max_num_back] << endl;
-//                Ellipse(hdc, x0 + d_per * max_num_back - rad, y0 - num[max_num_back] - rad, x0 + d_per * max_num_back + rad, y0 - num[max_num_back] + rad);
-//                period = max_num_back - max_ind;
-//                cout << "period:\n" << period << "\t" << num[period - 1] << "   " << num[period] << "   " << num[period + 1] << endl;
-//                Ellipse(hdc, x0 + d_per * period - rad, y0 - num[period] - rad, x0 + d_per * period + rad, y0 - num[period] + rad);
-//            }
-//            else
-//            {
-//                //cout << "there is no period" << endl;
-//                period = count - 1;
-//            }
-//
-
             // проверка на наличие отрицательного выброса 
             // если мин значение - не выброс
-            if ((abs(numbers[min_ind] - numbers[min_ind - mas]) / (discr_per*mas)) < l_floor)
+            if ((abs(numbers[min_ind] - numbers[min_ind - mas]) / (discr_per*mas)) < floor)
             {
-                if ((abs((numbers[min_ind]) - (numbers[min_ind + mas])) / (discr_per * mas)) < r_floor)
+                if ((abs((numbers[min_ind]) - (numbers[min_ind + mas])) / (discr_per * mas)) < floor)
                 {
                     U_a = min_ind;
                     min_ind = count - 1;
@@ -413,13 +391,12 @@ int main(int argc, const char* argv[])
             {
                 blowout = true;
                 cout << "there is a min outlier" << endl;
-                //cout << "min index\n" << min_ind << "\t" << numbers[min_ind] << endl;
                 Ellipse(hdc, x0 + d_per * min_ind - rad, y0 - num[min_ind] + rad, x0 + d_per * min_ind + rad, y0 - num[min_ind] - rad);
             }
 
 
 
-            // если нет отрицательного выброса
+            // нахождение конца среза, если нет отрицательного выброса
             if (!blowout)
             {
                 check = false;
@@ -427,7 +404,7 @@ int main(int argc, const char* argv[])
                 do
                 {
                     ang_k = (abs(numbers[i] - numbers[i - mas])) / (discr_per * mas);
-                    if (ang_k > l_floor)
+                    if (ang_k > floor)
                     {
                         check = true;
                     }
@@ -436,7 +413,6 @@ int main(int argc, const char* argv[])
                 } while (!check);
                 end_cut = i;
                 Ellipse(hdc, x0 + d_per * end_cut - rad, y0 - num[end_cut] - rad, x0 + d_per * end_cut + rad, y0 - num[end_cut] + rad);
-                //cout << "end of cut\n" << end_cut << "\t" << numbers[end_cut] << endl;
                 min_ind = end_cut;
             }
 
@@ -448,7 +424,7 @@ int main(int argc, const char* argv[])
             do
             {
                 ang_k = (abs((numbers[i]) - (numbers[i - mas]))) / (discr_per * mas);
-                if (ang_k < l_floor)
+                if (ang_k < floor)
                 {
                     check = true;
                 }
@@ -457,18 +433,9 @@ int main(int argc, const char* argv[])
             } while (!check);
             beg_cut = i+1;
             Ellipse(hdc, x0 + d_per * beg_cut - rad, y0 - num[beg_cut] - rad, x0 + d_per * beg_cut + rad, y0 - num[beg_cut] + rad);
-            //cout << "beg of cut\n" << beg_cut << "\t" << numbers[beg_cut] << endl;
 
 
-            // если есть выброс, то амплитуда будет смотреться по началу среза
-            if (blowout)
-            {
-                Ua_num = numbers[beg_cut];
-            }
-
-
-
-            // если нет максимального выброса
+            // если нет выброса
             // нахождение начала плоской вершины
             if (!blowout)
             {
@@ -477,7 +444,7 @@ int main(int argc, const char* argv[])
                 do
                 {
                     ang_k = (abs(numbers[i] - numbers[i - mas])) / (discr_per * mas);
-                    if (ang_k > l_floor)
+                    if (ang_k > floor)
                     {
                         check = true;
                     }
@@ -486,19 +453,20 @@ int main(int argc, const char* argv[])
                 } while (!check);
                 beg_top = i;
                 Ellipse(hdc, x0 + d_per * beg_top - rad, y0 - num[beg_top] - rad, x0 + d_per * beg_top + rad, y0 - num[beg_top] + rad);
-                //cout << "beg_top\n" << beg_top << "\t" << numbers[beg_top] << endl;
             }
 
 
+
+            // если есть выброс
+            // нахождение начала плоской вершины
             if (blowout)
             {
-                //  нахождение начала плоской вершины
                 check = false;
                 i = beg_cut - mas;
                 do
                 {
                     ang_k = (abs((numbers[i]) - (numbers[i - mas]))) / (discr_per * mas);
-                    if (ang_k > r_floor)
+                    if (ang_k > floor)
                     {
                         check = true;
                     }
@@ -508,6 +476,7 @@ int main(int argc, const char* argv[])
                 beg_top = i;
                 Ellipse(hdc, x0 + d_per * beg_top - rad, y0 - num[beg_top] - rad, x0 + d_per * beg_top + rad, y0 - num[beg_top] + rad);
             }
+
 
 
             //  нахождение конца плоской вершины
@@ -516,7 +485,7 @@ int main(int argc, const char* argv[])
             do
             {
                 ang_k = (abs((numbers[i]) - (numbers[i + mas]))) / (discr_per * mas);
-                if (ang_k < r_floor)
+                if (ang_k < floor)
                 {
                     check = true;
                 }
@@ -525,34 +494,56 @@ int main(int argc, const char* argv[])
             } while (!check);
             end_top = i+mas;
             Ellipse(hdc, x0 + d_per * end_top - rad, y0 - num[end_top] - rad, x0 + d_per * end_top + rad, y0 - num[end_top] + rad);
-            //cout << "end of top\n" << end_top << "\t" << numbers[end_top] << "\t" << numbers[end_top + 1] << endl;
 
+
+
+
+            // если есть выброс, то амплитуда будет смотреться по началу среза
+            if (blowout)
+            {
+                // среднее значений чисел между началом фронта и вершиной
+                for (i = beg_front; i < max_ind - 1; i++)
+                    too_m = too_m + numbers[i];
+                too_m = too_m / (max_ind - beg_front);
+                // если разница значений между концом вершины и началом среза слишком большая
+                if (abs(numbers[end_top] - numbers[beg_cut]) > too_m)
+                {
+                    // будем считать, что срез начинается там, где заканчивается вершина
+                    beg_cut = end_top;
+                }
+                Ellipse(hdc, x0 + d_per * beg_cut - rad, y0 - num[beg_cut] - rad, x0 + d_per * beg_cut + rad, y0 - num[beg_cut] + rad);
+                Ua_num = numbers[beg_cut];
+            }
+
+
+            // среднее значения чисел, идущих перед фронтом
             ave = 0;
             for (i = 0; i < beg_front; i++)
             {
                 ave = ave + abs(numbers[i]);
             }
             ave = ave / beg_front;
-            cout << "!!!!  " << ave << endl;
-            // нахождение поля
+
+
+            // нахождение ровного участка после мин амплитуды
+            // если имеется отрицательный выброс
             if (blowout)
             {
                 check = false;
                 cc = 0;
                 i = min_ind + 1;
+                if (type == "-w")
+                    mas = mas / 2;
+                // пока не найдём ровный участок после мин амплитуды
                 do
                 {
                     for (j = 0; j < mas; j++)
                     {
-                        //ang_k = (abs((numbers[i]) - (numbers[i + j + 1]))) / (discr_per * (j + 1));
-
                         if (abs(numbers[i+j]) < ave)
                         {
                             cc++;
-                            //cout << ang_k << "\n";
                         }
                     }
-                    // как только начнётся подъём
                     if (cc == mas)
                     {
                         check = true;
@@ -563,22 +554,24 @@ int main(int argc, const char* argv[])
                 } while (!check);
                 beg_field = i;
                 Ellipse(hdc, x0 + d_per * beg_field - rad, y0 - num[beg_field] - rad, x0 + d_per * beg_field + rad, y0 - num[beg_field] + rad);
+                if (type == "-w")
+                    mas = mas * 2;
             }
 
 
 
             //// выводы
-            cout << "beg of front\n" << beg_front << "\t" << numbers[beg_front] << "\t" << numbers[beg_front + 1] << endl;
+            cout << "beg of front\t" << beg_front << "\t" << numbers[beg_front] <<  endl;
             //cout << i << "\t" << numbers[i] << "\t" << numbers[i + 1] << "\t" << ang_k << endl;
-            cout << "max index\n" << max_ind << "\t" << numbers[max_ind] << endl;
-            cout << "beg of top\n" << beg_top << "\t" << numbers[beg_top] << "\t" << numbers[beg_top - 1] << endl;
+            cout << "max index\t" << max_ind << "\t" << numbers[max_ind] << endl;
+            cout << "beg of top\t" << beg_top << "\t" << numbers[beg_top] << endl;
             //cout << i << "\t" << numbers[i] << "\t" << numbers[i + 1] << "\t" << ang_k << endl;
-            cout << "end of top\n" << end_top << "\t" << numbers[end_top] << "\t" << numbers[end_top + 1] << endl;
+            cout << "end of top\t" << end_top << "\t" << numbers[end_top]  << endl;
             //cout << i << "\t" << num[i] << "\t" << num[i + 1] << "\t" << ang_k << endl;
-            cout << "beg of cut\n" << beg_cut << "\t" << numbers[beg_cut] << endl;
+            cout << "beg of cut\t" << beg_cut << "\t" << numbers[beg_cut] << endl;
             //cout << i << "\t" << numbers[i] << "\t" << numbers[i + 1] << "\t" << ang_k << endl;
-            cout << "min index\n" << min_ind << "\t" << numbers[min_ind] << endl;
-            cout << "beg_field\n" << beg_field << "\t" << numbers[beg_field] << "\t" << numbers[beg_field + 1] << endl;
+            cout << "min index\t" << min_ind << "\t" << numbers[min_ind] << endl;
+            cout << "beg_field\t" << beg_field << "\t" << numbers[beg_field]  << endl;
             //cout << i << "\t" << numbers[i] << "\t" << numbers[i + 1] << "\t" << ang_k << endl;
 
 
@@ -592,24 +585,37 @@ int main(int argc, const char* argv[])
 
 
             double part_01 = Ua_num * 0.1;
-            double part_09 = Ua_num * 0.9;
+            double part_09 = Ua_num * 0.9;      
             double part_05 = Ua_num * 0.5;
-            double AUn;
-            double AU_n;
-            double time_front = 0;      // время фронта
-            double time_work = 0;       // время работы сигнала
-            double time_cut = 0;        // время среза
-            double time_fr_out = 0;     // время фронта
-            double time_cut_out = 0;    // время работы сигнала
+            double AUn;                 
+            double AU_n;                
+            double time_front = 0;              // длительность фронта
+            double time_work = 0;               // длительность работы сигнала
+            double time_cut = 0;                // длительность среза
+            double time_fr_out = 0;             // длительность выброса по переднему фронту
+            double time_cut_out = 0;            // длительность выброса по заднему фронту
             int r = 0;
-            int t_f_c = 0;
-            int t_c_c = 0;
-            int t_w_c = 0;
-
-            AUn = (Ua_num - num[Un]) / k;
-            AU_n = num[U_n] ;
+            string mach;
 
 
+            if (type == "-j")
+            {
+                mach = " *10^(-8)";
+            }
+            else if (type == "-w")
+            {
+                mach = " *10^(-5)";
+            }
+            else if (type == "-o")
+            {
+                mach = " *10^(-7)";
+            }
+
+            //AUn = (Ua_num - num[Un]) / k;
+            //AU_n = num[U_n] ;
+
+
+            // длительность фронта
             while (numbers[r] < part_01)
             {
                 r++;
@@ -617,12 +623,12 @@ int main(int argc, const char* argv[])
             while ((numbers[r] >= part_01) && (numbers[r] <= part_09) && (r < count - 1))
             {
                 time_front = time_front + discr_per;
-                t_f_c++;
                 r++;
             }
-            cout << "time of front\n" << r << "\t" << t_f_c << "\t" << time_front << endl;
+            cout << "time of front:\t"  << time_front << mach << endl;
 
 
+            // длительность среза
             r = end_top;
             while (numbers[r] > part_09)
             {
@@ -631,12 +637,12 @@ int main(int argc, const char* argv[])
             while ((numbers[r] >= part_01) && (numbers[r] <= part_09) && (r < count - 1))
             {
                 time_cut = time_cut + discr_per;
-                t_c_c++;
                 r++;
             }
-            cout << "time of cut\n" << r << "\t" << t_c_c << "\t" << time_cut << endl;
+            cout << "time of cut:\t"  <<  time_cut << mach << endl;
 
 
+            // длительность работы сигнала
             r = beg_front;
             while (numbers[r] < part_05)
             {
@@ -645,25 +651,13 @@ int main(int argc, const char* argv[])
             while ((numbers[r] >= part_05) && (r < count - 1))
             {
                 time_work = time_work + discr_per;
-                t_w_c++;
                 r++;
             }
-            cout << "time of work\n" << r << "\t" << t_w_c << "\t" << time_work << endl;
+            cout << "time of work:\t"  <<  time_work << mach << endl;
 
 
-            r = beg_cut;
-            while (numbers[r] > part_01)
-            {
-                r++;
-            }
-            while ((r < beg_field) && (r < count - 1))
-            {
-                time_cut_out = time_cut_out + discr_per;
-                r++;
-            }
-            cout << "time_cut_out\n" << r << "\t" << time_cut_out << endl;
 
-
+            // длительность выброса по переднему фронту
             r = beg_front;
             while (numbers[r] < part_09)
             {
@@ -674,12 +668,28 @@ int main(int argc, const char* argv[])
                 time_fr_out = time_fr_out + discr_per;
                 r++;
             }
-            cout << "time_fr_out\n" << r << "\t" << time_fr_out << endl;
+            cout << "time_fr_out:\t" << time_fr_out << mach << endl;
 
 
+            // длительность выброса по заднему фронту
+            r = beg_cut;
+            while (numbers[r] > part_01)
+            {
+                r++;
+            }
+            while ((r < beg_field) && (r < count - 1))
+            {
+                time_cut_out = time_cut_out + discr_per;
+                r++;
+            }
+            cout << "time_cut_out:\t" <<  time_cut_out << mach << endl;
+
+
+
+            // аплитуды выбросов 
             if (blowout)
             {
-                // аплитуды выброса
+                //отрицательного
                 double U_n_min = numbers[max_ind];
                 for (i = max_ind + 1; i < beg_top; i++)
                 {
@@ -690,6 +700,7 @@ int main(int argc, const char* argv[])
                     }
                 }
 
+                // положительного
                 double Un_max = numbers[min_ind];
                 for (i = min_ind + 1; i < beg_field; i++)
                 {
@@ -700,7 +711,8 @@ int main(int argc, const char* argv[])
                     }
                 }
                 cout << "Un = " << numbers[Un] << "\t" << "U_n = " << numbers[U_n] << endl;
-                cout << "Un = " << Un << "\t" << "U_n = " << U_n << endl;
+
+
             }
             else 
             {
@@ -709,14 +721,17 @@ int main(int argc, const char* argv[])
             }
 
 
-            double Ub01 = (numbers[max_ind] - Ua_num);
-            double Ub10 = numbers[min_ind];
+            double Ub01 = (numbers[max_ind] - Ua_num);                      // амплитуда выброса по переднему фронту
+            double Ub10 = numbers[min_ind];                                 // амплитуда выброса по заднему фронту
             cout << "Ub01 = " << Ub01 << "\tUb10 = " << Ub10 << endl;
-            cout << "AUn = " << AUn << "\t" << "AU_n = " << AU_n << endl;
 
 
         }
     }//end if
+
+
+
+
 
     return 0;
 }
