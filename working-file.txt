@@ -31,6 +31,8 @@ int main(int argc, const char* argv[])
     // **************************************************************************************************** //
 
 
+
+
     ifstream inputFile("C:\\Users\\User\\Desktop\\практика\\просто_тесты\\3.txt"); //чтение из файла
     //ifstream inputFile("C:\\Users\\User\\Desktop\\практика\\импульсы_с_выбросами\\1.txt"); //чтение из файла
     // если не существует этого файла
@@ -120,7 +122,7 @@ int main(int argc, const char* argv[])
             int colR = 255;
             int colG = 0;
             int colB = 0;
-            double x0 = 350;
+            double x0 = 400;
             double y0 = 370;
             int rad = 5;
 
@@ -187,7 +189,6 @@ int main(int argc, const char* argv[])
             int beg_top = 0;            // начало плоской вершины
             int end_top = 0;            // конец плоской вершины
             int beg_cut = 0;            // начало среза
-            //int end_cut = 0;          // конец среза
             int beg_per = 0;            // начало периода
             int min_ind = 0;            // индекс мин ампл
             int beg_field = 0;          // начало стабильности значений после мин ампл
@@ -224,7 +225,7 @@ int main(int argc, const char* argv[])
             double min_num = 1000;
 
             double r_floor = tan(10 * M_PI / 180);
-            cout << "fault = " << r_floor << endl;
+            //cout << "fault = " << r_floor << endl;
             double l_floor = abs(tan(170 * M_PI / 180));
             int cc;
             double ang_k;
@@ -252,9 +253,9 @@ int main(int argc, const char* argv[])
                     i++;
             } while (!check);
             beg_front = i;
-            cout << "beg of front\n" << beg_front << "\t" << numbers[beg_front] << "\t" << numbers[beg_front + 1] << endl;
-            //cout << i << "\t" << numbers[i] << "\t" << numbers[i + 1] << "\t" << ang_k << endl;
             Ellipse(hdc, x0 + d_per * beg_front - rad, y0 - num[beg_front] - rad, x0 + d_per * beg_front + rad, y0 - num[beg_front] + rad);
+
+
 
 
             i = beg_front + 1;
@@ -267,10 +268,11 @@ int main(int argc, const char* argv[])
                     min_num = num[i];
                 }
             }
-            cout << "min index\n" << min_ind << "\t" << numbers[min_ind] << endl;
             i++;
             min_num = pow(10, 6);
             //Ellipse(hdc, x0 + discr_per * min_ind - rad, y0 - num[min_ind] * pop + rad, x0 + discr_per * min_ind + rad, y0 - num[min_ind] * pop - rad);
+
+
 
 
             i = beg_front + 1;;
@@ -283,9 +285,10 @@ int main(int argc, const char* argv[])
                     max_num = num[i];
                 }
             }
-            cout << "max index\n" << max_ind << "\t" << numbers[max_ind] << endl;
             Ellipse(hdc, x0 + d_per * max_ind - rad, y0 - num[max_ind] + rad, x0 + d_per * max_ind + rad, y0 - num[max_ind]  - rad);
             
+
+
 
 
             //// поиск ещё одного большого значения
@@ -307,9 +310,10 @@ int main(int argc, const char* argv[])
             }
             else
             {
-                cout << "there is no period" << endl;
+                //cout << "there is no period" << endl;
                 period = count - 1;
             }
+
 
 
 
@@ -324,9 +328,10 @@ int main(int argc, const char* argv[])
                     min_num = num[i];
                 }
             }
-            cout << "min index\n" << min_ind << "\t" << numbers[min_ind] << endl;
             i++;
             Ellipse(hdc, x0 + d_per * min_ind - rad, y0 - num[min_ind] + rad, x0 + d_per * min_ind + rad, y0 - num[min_ind] - rad);
+
+
 
 
 
@@ -351,6 +356,8 @@ int main(int argc, const char* argv[])
 
 
 
+
+
             // нахождение начала среза
             check = false;
             cc = 0;
@@ -366,9 +373,9 @@ int main(int argc, const char* argv[])
                     i--;
             } while (!check);
             beg_cut = i+1;
-            cout << "beg of cut\n" << beg_cut << "\t" << numbers[beg_cut] << endl;
-            cout << i << "\t" << numbers[i] << "\t" << numbers[i + 1] << "\t" << ang_k << endl;
             Ellipse(hdc, x0 + d_per * beg_cut - rad, y0 - num[beg_cut] - rad, x0 + d_per * beg_cut + rad, y0 - num[beg_cut] + rad);
+
+
 
 
 
@@ -388,9 +395,9 @@ int main(int argc, const char* argv[])
                     i--;
             } while (!check);
             beg_top = i;
-            cout << "beg of top\n" << beg_top << "\t" << numbers[beg_top] << "\t" << numbers[beg_top - 1] << endl;
-            //cout << i << "\t" << numbers[i] << "\t" << numbers[i + 1] << "\t" << ang_k << endl;
             Ellipse(hdc, x0 + d_per * beg_top - rad, y0 - num[beg_top] - rad, x0 + d_per * beg_top + rad, y0 - num[beg_top] + rad);
+
+
 
 
 
@@ -409,11 +416,13 @@ int main(int argc, const char* argv[])
                     i--;
             } while (!check);
             end_top = i;
-            cout << "end of top\n" << end_top << "\t" << numbers[end_top] << "\t" << numbers[end_top + 1] << endl;
-            //cout << i << "\t" << num[i] << "\t" << num[i + 1] << "\t" << ang_k << endl;
             Ellipse(hdc, x0 + d_per * end_top - rad, y0 - num[end_top] - rad, x0 + d_per * end_top + rad, y0 - num[end_top] + rad);
 
 
+
+
+
+            // нахождение поля
             check = false;
             cc = 0;
             i = min_ind + 1;
@@ -432,43 +441,14 @@ int main(int argc, const char* argv[])
                 if (cc == mas)
                 {
                     check = true;
-                    for (j = 0; j < mas; j++)
-                    {
-                        cout << numbers[i + j] << "\n";
-                    }
                 }
                 else
                     i++;
                 cc = 0;
             } while (!check);
             beg_field = i;
-            cout << "beg_field\n" << beg_field << "\t" << numbers[beg_field] << "\t" << numbers[beg_field + 1] << endl;
-            cout << i << "\t" << numbers[i] << "\t" << numbers[i + 1] << "\t" << ang_k << endl;
             Ellipse(hdc, x0 + d_per * beg_field - rad, y0 - num[beg_field] - rad, x0 + d_per * beg_field + rad, y0 - num[beg_field] + rad);
 
-
-
-            // аплитуды выброса
-            double Un_min = numbers[max_ind];
-            for (i = max_ind + 1; i < beg_top; i++)
-            {
-                if (numbers[i] < Un_min)
-                {
-                    Un_min = numbers[i];
-                    Un = i;
-                }
-            }
-
-            double U_n_max = numbers[min_ind];
-            for (i = min_ind + 1; i < count; i++)
-            {
-                if (numbers[i] > U_n_max)
-                {
-                    U_n_max = numbers[i];
-                    U_n = i;
-                }
-            }
-            cout << "Un = " << Un << "\t" << "U_n = " << U_n << endl;
 
 
             // проверка на наличие выброса
@@ -489,12 +469,10 @@ int main(int argc, const char* argv[])
                 if (abs(abs(num[end_top]) - abs(num[beg_cut])) / discr_per > l_floor)
                 {
                     Ua_num = numbers[end_top];
-                    cout << "top" << endl;
                 }
                 else
                 {
                     Ua_num = numbers[beg_cut];
-                    cout << "cut" << endl;
                 }
                 cout << "there is an outlier" << endl;
             }
@@ -505,6 +483,19 @@ int main(int argc, const char* argv[])
 
 
             // выводы
+            cout << "beg of front\n" << beg_front << "\t" << numbers[beg_front] << "\t" << numbers[beg_front + 1] << endl;
+            //cout << i << "\t" << numbers[i] << "\t" << numbers[i + 1] << "\t" << ang_k << endl;
+            cout << "max index\n" << max_ind << "\t" << numbers[max_ind] << endl;
+            cout << "beg of top\n" << beg_top << "\t" << numbers[beg_top] << "\t" << numbers[beg_top - 1] << endl;
+            //cout << i << "\t" << numbers[i] << "\t" << numbers[i + 1] << "\t" << ang_k << endl;
+            cout << "end of top\n" << end_top << "\t" << numbers[end_top] << "\t" << numbers[end_top + 1] << endl;
+            //cout << i << "\t" << num[i] << "\t" << num[i + 1] << "\t" << ang_k << endl;
+            cout << "beg of cut\n" << beg_cut << "\t" << numbers[beg_cut] << endl;
+            //cout << i << "\t" << numbers[i] << "\t" << numbers[i + 1] << "\t" << ang_k << endl;
+            cout << "min index\n" << min_ind << "\t" << numbers[min_ind] << endl;
+            cout << "beg_field\n" << beg_field << "\t" << numbers[beg_field] << "\t" << numbers[beg_field + 1] << endl;
+            //cout << i << "\t" << numbers[i] << "\t" << numbers[i + 1] << "\t" << ang_k << endl;
+
 
 
 
@@ -601,22 +592,36 @@ int main(int argc, const char* argv[])
             cout << "time_fr_out\n" << r << "\t" << time_fr_out << endl;
 
 
+            // аплитуды выброса
+            double Un_min = numbers[max_ind];
+            for (i = max_ind + 1; i < beg_top; i++)
+            {
+                if (numbers[i] < Un_min)
+                {
+                    Un_min = numbers[i];
+                    Un = i;
+                }
+            }
+
+            double U_n_max = numbers[min_ind];
+            for (i = min_ind + 1; i < count; i++)
+            {
+                if (numbers[i] > U_n_max)
+                {
+                    U_n_max = numbers[i];
+                    U_n = i;
+                }
+            }
+            cout << "Un = " << Un << "\t" << "U_n = " << U_n << endl;
+
 
             double Ub01 = (numbers[max_ind] - Ua_num) / k;
             double Ub10 = numbers[min_ind] / k;
             cout << "Ub01 = " << Ub01 << "\tUb10 = " << Ub10 << endl;
             cout << "AUn = " << AUn << "\t" << "AU_n = " << AU_n << endl;
 
-
-
-
-
         }
     }//end if
-
-
-
-
 
     return 0;
 }
