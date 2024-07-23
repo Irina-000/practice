@@ -2,27 +2,16 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
-#include <cmath>
 #include <windows.h>
 #include "ConWin.h"
-#include <process.h>
-#include <conio.h>
 #define _USE_MATH_DEFINES 
 #define M_PI 3.14159265358979323846
+#include <cmath>
 
 
 using namespace std;
 extern HDC hdc; // объявим  контекст устройства
-void printToCoordinates(int x, int y, const std::string& text)
-{
-    printf("\033[%d;%dH%s\n", x, x, text.c_str());
-}
 
-void gotoxy(double x, double y) //Поместить курсор на определенные координаты
-{
-    COORD pos = {x,y}; // Инициализируются поля переменной Coor 
-    SetConsoleCursorPosition(GetConcolWindow, pos); // Установка курсора на координаты, указанные в структурной переменной Coor
-}
 
 HDC hdc;	// Объявим контекст устройства
             // Контекст устройства по сути это структура,
@@ -126,17 +115,17 @@ int main(int argc, const char* argv[])
     }
 
     vector<double> num;                         // вектор удобных чисел
-    vector<double> numbers;                     // вектор истинных чисел
+    vector<double> real_num;                     // вектор истинных чисел
     stringstream str(test);                     // переменная для перевода строки в набор чисел
     string number;
 
     while (getline(str, number, ','))           // вычленение чисел из строки, разделённых запятой
     {
         // добавление нового числа в конец вектора чисел
-        numbers.push_back(stod(number));
+        real_num.push_back(stod(number));
     }
 
-    int count = numbers.size();
+    int count = real_num.size();
     int i, j;
     double discr_per;
     int k;
@@ -166,7 +155,7 @@ int main(int argc, const char* argv[])
     // удобные числа для рисовани графика
     for (i = 0; i < count; i++)
     {
-        num.push_back(numbers[i] * k);
+        num.push_back(real_num[i] * k);
     }
 
 
@@ -192,8 +181,8 @@ int main(int argc, const char* argv[])
 
             setlocale(LC_ALL, "Russian");
             // начальные координаты, с которых будет рисоваться график
-            double x0 = 550;
-            double y0 = 520;
+            double x0 = 700;
+            double y0 = 600;
             int rad = 5;        // радиус точек
 
             //for (int g = 0; g < 7; g++)
@@ -239,7 +228,6 @@ int main(int argc, const char* argv[])
                 Polyline(hdc, poly, 2);
             }
 
-            gotoxy(x0 + 600, y0 + 10);
 
 
             // изменение значений шага дискретизайии для удобства рисования графика и вычисления дальнейших значений
@@ -264,19 +252,19 @@ int main(int argc, const char* argv[])
 
 
             int Ua_ind = 0;                 // индекс амплитуды сигнала
-            double Ua_num;              // амплитуда сигнала
-            int U_a = 0;                // индекс мин амплитуды сигнала
-            int max_ind = 0;            // индекс максимальной амплитуды
-            int max_Ua = 0;             // значение макс ампл
+            double Ua_num;                  // амплитуда сигнала
+            int U_a_ind = 0;                // индекс мин амплитуды сигнала
+            int max_ind = 0;                // индекс максимальной амплитуды
+            int max_Ua = 0;                 // значение макс ампл
             int beg_front_ind = 0;          // начало фронта
-            int beg_top_ind = 0;            // начало плоской вершины
-            int end_top_ind = 0;            // конец плоской вершины
+            int end_front_ind = 0;          // конец фронта
+            int beg_top_ind = 0;            // начало полки импульса
+            int end_top_ind = 0;            // конец полки импульса
             int beg_cut_ind = 0;            // начало среза
             int end_cut_ind = 0;            // начало среза
-            int min_ind = 0;            // индекс мин ампл
-            int beg_field = 0;          // начало стабильности значений после мин ампл
-            //double min_Ua = 0;          // значение мин ампл
-            bool blowout = false;       // наличие выброса
+            int min_ind = 0;                // индекс мин ампл
+            int beg_field = 0;              // начало стабильности значений после мин ампл
+            bool blowout = false;           // наличие выброса
 
 
 
@@ -288,8 +276,10 @@ int main(int argc, const char* argv[])
             // макс амплитуда
             // проверка на наличие выброса
             // начало или конец среза
-            // начало плоской вершины
-            // конец вершины
+            // начало полки импульса
+            // конец полки импульса
+            // конец фронта
+            // конец среза
             // поле
 
 
@@ -333,7 +323,7 @@ int main(int argc, const char* argv[])
             // пока коэф наклона между двумя точками меньше tg10, будем продвигаться по графику
             do
             { 
-                ang_k = (abs((numbers[i]) - (numbers[i + mas]))) / (discr_per * mas);
+                ang_k = (abs((real_num[i]) - (real_num[i + mas]))) / (discr_per * mas);
                 if (ang_k > floor)
                 {
                     check = true;
@@ -350,10 +340,10 @@ int main(int argc, const char* argv[])
             i = beg_front_ind + 1;
             for (i = beg_front_ind + 1; i < count - 1; i++)
             {
-                if (num[i] < min_num)
+                if (real_num[i] < min_num)
                 {
                     min_ind = i;
-                    min_num = num[i];
+                    min_num = real_num[i];
                 }
             }
 
@@ -362,10 +352,10 @@ int main(int argc, const char* argv[])
             i = beg_front_ind + 1;;
             for (i = beg_front_ind + 1; i < min_ind - 1; i++)
             {
-                if (num[i] > max_num)
+                if (real_num[i] > max_num)
                 {
                     max_ind = i;
-                    max_num = num[i];
+                    max_num = real_num[i];
                 }
             }
 
@@ -373,11 +363,11 @@ int main(int argc, const char* argv[])
             
             // проверка на наличие выброса
             // если нет выброса
-            if  (abs(abs(numbers[max_ind]) - abs(numbers[max_ind + mas])) / (discr_per * mas) < floor)
+            if  (abs(abs(real_num[max_ind]) - abs(real_num[max_ind + mas])) / (discr_per * mas) < floor)
             {
                 Ua_ind = max_ind;
-                Ua_num = numbers[max_ind];
-                max_ind = 0;
+                Ua_num = real_num[max_ind];
+                //max_ind = 0;
             }
             // если был выброс
             if (Ua_ind == 0)
@@ -389,16 +379,16 @@ int main(int argc, const char* argv[])
 
             // проверка на наличие отрицательного выброса 
             // если мин значение - не выброс
-            if ((abs(numbers[min_ind] - numbers[min_ind - mas]) / (discr_per*mas)) < floor)
+            if ((abs(real_num[min_ind] - real_num[min_ind - mas]) / (discr_per*mas)) < floor)
             {
-                if ((abs((numbers[min_ind]) - (numbers[min_ind + mas])) / (discr_per * mas)) < floor)
+                if ((abs((real_num[min_ind]) - (real_num[min_ind + mas])) / (discr_per * mas)) < floor)
                 {
-                    U_a = min_ind;
+                    U_a_ind = min_ind;
                     min_ind = count - 1;
                 }
             }
             // если был выброс
-            if (U_a == 0)
+            if (U_a_ind == 0)
             {
                 blowout = true;
                 Ellipse(hdc, x0 + d_per * min_ind - rad, y0 - num[min_ind] + rad, x0 + d_per * min_ind + rad, y0 - num[min_ind] - rad);
@@ -410,10 +400,10 @@ int main(int argc, const char* argv[])
             if (!blowout)
             {
                 check = false;
-                i = U_a - 1;
+                i = U_a_ind - 1;
                 do
                 {
-                    ang_k = (abs(numbers[i] - numbers[i - mas])) / (discr_per * mas);
+                    ang_k = (abs(real_num[i] - real_num[i - mas])) / (discr_per * mas);
                     if (ang_k > floor)
                     {
                         check = true;
@@ -433,7 +423,7 @@ int main(int argc, const char* argv[])
             i = min_ind - 1;
             do
             {
-                ang_k = (abs((numbers[i]) - (numbers[i - mas]))) / (discr_per * mas);
+                ang_k = (abs((real_num[i]) - (real_num[i - mas]))) / (discr_per * mas);
                 if (ang_k < floor)
                 {
                     check = true;
@@ -442,18 +432,17 @@ int main(int argc, const char* argv[])
                     i--;
             } while (!check);
             beg_cut_ind = i+1;
-            Ellipse(hdc, x0 + d_per * beg_cut_ind - rad, y0 - num[beg_cut_ind] - rad, x0 + d_per * beg_cut_ind + rad, y0 - num[beg_cut_ind] + rad);
 
 
             // если нет выброса
-            // нахождение начала плоской вершины
+            // нахождение начала полки импульса
             if (!blowout)
             {
                 check = false;
                 i = Ua_ind - 1;
                 do
                 {
-                    ang_k = (abs(numbers[i] - numbers[i - mas])) / (discr_per * mas);
+                    ang_k = (abs(real_num[i] - real_num[i - mas])) / (discr_per * mas);
                     if (ang_k > floor)
                     {
                         check = true;
@@ -463,19 +452,21 @@ int main(int argc, const char* argv[])
                 } while (!check);
                 beg_top_ind = i;
                 Ellipse(hdc, x0 + d_per * beg_top_ind - rad, y0 - num[beg_top_ind] - rad, x0 + d_per * beg_top_ind + rad, y0 - num[beg_top_ind] + rad);
+                //Ua_num = real_num[beg_top_ind];
+                //Ua_ind = beg_top_ind;
             }
 
 
 
             // если есть выброс
-            // нахождение начала плоской вершины
+            // нахождение начала полки импульса
             if (blowout)
             {
                 check = false;
                 i = beg_cut_ind - mas;
                 do
                 {
-                    ang_k = (abs((numbers[i]) - (numbers[i - mas]))) / (discr_per * mas);
+                    ang_k = (abs((real_num[i]) - (real_num[i - mas]))) / (discr_per * mas);
                     if (ang_k > floor)
                     {
                         check = true;
@@ -489,12 +480,12 @@ int main(int argc, const char* argv[])
 
 
 
-            //  нахождение конца плоской вершины
+            //  нахождение конца полки импульса
             check = false;
             i = beg_cut_ind - 1;
             do
             {
-                ang_k = (abs((numbers[i]) - (numbers[i + mas]))) / (discr_per * mas);
+                ang_k = (abs((real_num[i]) - (real_num[i + mas]))) / (discr_per * mas);
                 if (ang_k < floor)
                 {
                     check = true;
@@ -513,24 +504,73 @@ int main(int argc, const char* argv[])
             {
                 // среднее значений чисел между началом фронта и вершиной
                 for (i = beg_front_ind; i < max_ind - 1; i++)
-                    too_m = too_m + numbers[i];
+                    too_m = too_m + real_num[i];
                 too_m = too_m / (max_ind - beg_front_ind);
                 // если разница значений между концом вершины и началом среза слишком большая
-                if (abs(numbers[end_top_ind] - numbers[beg_cut_ind]) > too_m)
+                if (abs(real_num[end_top_ind] - real_num[beg_cut_ind]) > too_m)
                 {
                     // будем считать, что срез начинается там, где заканчивается вершина
                     beg_cut_ind = end_top_ind;
                 }
                 Ellipse(hdc, x0 + d_per * beg_cut_ind - rad, y0 - num[beg_cut_ind] - rad, x0 + d_per * beg_cut_ind + rad, y0 - num[beg_cut_ind] + rad);
-                Ua_num = numbers[beg_cut_ind];
+                Ua_num = real_num[beg_cut_ind];
             }
+
+
+            // нахождение конца фронта
+            if (!blowout)
+            {
+                end_front_ind = beg_top_ind;
+            }
+            if (blowout)
+            {
+                end_front_ind = max_ind-1;
+                while (((real_num[max_ind] - real_num[end_front_ind]) < (real_num[max_ind] - real_num[beg_top_ind])) && (end_front_ind > beg_front_ind))
+                {
+                    end_front_ind = end_front_ind - 1;
+                }
+                if (end_front_ind <= beg_front_ind)
+                {
+                    end_front_ind = max_ind - 1;
+                }
+                Ellipse(hdc, x0 + d_per * end_front_ind - rad, y0 - num[end_front_ind] - rad, x0 + d_per * end_front_ind + rad, y0 - num[end_front_ind] + rad);
+                //cout << end_front_ind << "\t" << real_num[end_front_ind] << endl;
+            }
+
+
+
+
+
+            //нахождение конца среза
+            if (blowout)
+            {
+                check = false;
+                double tt = abs(real_num[min_ind]);
+                for (int d = beg_cut_ind + 1; d < min_ind; d++)
+                {
+                    if ((real_num[d] < tt) && (real_num[d] >= 0))
+                    {
+                        tt = (real_num[d]);
+                        end_cut_ind = d;
+                        check = true;
+                    }
+                }
+                if (!check)
+                {
+                    end_cut_ind = min_ind - 1;
+                }
+                Ellipse(hdc, x0 + d_per * end_cut_ind - rad, y0 - num[end_cut_ind] - rad, x0 + d_per * end_cut_ind + rad, y0 - num[end_cut_ind] + rad);
+            }
+
+            
+
 
 
             // среднее значения чисел, идущих перед фронтом
             ave = 0;
             for (i = 0; i < beg_front_ind; i++)
             {
-                ave = ave + abs(numbers[i]);
+                ave = ave + abs(real_num[i]);
             }
             ave = ave / beg_front_ind;
 
@@ -549,7 +589,7 @@ int main(int argc, const char* argv[])
                 {
                     for (j = 0; j < mas; j++)
                     {
-                        if (abs(numbers[i+j]) < ave)
+                        if (abs(real_num[i+j]) < ave)
                         {
                             cc++;
                         }
@@ -575,39 +615,39 @@ int main(int argc, const char* argv[])
             cout << "отображаемые точки:" << endl;
             if (blowout)
             {
-                cout << "1) начало фронта\n2) выброс с максимальным значением амплитуды\n3) начало плоской вершины\n4) конец плоской вершины\n5) начало среза\n"
-                    << "6) выброс с минимальных значением амплитуды\n\n";
+                cout << "есть выбросы1) начало фронта\n2) конец фронта\n3) выброс с максимальным значением амплитуды\n4) начало полки импульса\n5) конец полки импульса\n6) начало среза\n"
+                    << "7) конец среза\n8) выброс с минимальных значением амплитуды\n";
             }
             else
             {
-                cout << "есть выбросы\n1) начало фронта\n2) начало плоской вершины\n3) конец плоской вершины\n4) начало среза\n"
-                    << "5) конец среза\n\n";
+                cout << "1) начало фронта\n2) конец фронта\n3) начало полки импульса\n4) конец полки импульса\n5) начало среза\n"
+                    << "6) конец среза\n";
                 min_ind = 0;
-            }
+            } 
 
 
             cout << "название\tномер точки\tзначение:\n";
             //// выводы
-            cout << "начало фронта\t" << beg_front_ind << "\t\t" << numbers[beg_front_ind] <<  endl;
-            //cout << i << "\t" << numbers[i] << "\t" << numbers[i + 1] << "\t" << ang_k << endl;
+            cout << "начало фронта\t" << beg_front_ind << "\t\t" << real_num[beg_front_ind] <<  endl;
+            cout << "конец фронта\t" << end_front_ind << "\t\t" << real_num[end_front_ind] << endl;
+            //cout << i << "\t" << real_num[i] << "\t" << real_num[i + 1] << "\t" << ang_k << endl;
             if (!blowout)
             {
                 cout << "выброс (макс)\t-" << "\t\t   -" << endl;
             }
             else
-                cout << "выброс (макс)\t" << max_ind << "\t\t" << numbers[max_ind] << endl;
-            cout << "начало вершины\t" << beg_top_ind << "\t\t" << numbers[beg_top_ind] << endl;
-            cout << "конец вершины\t" << end_top_ind << "\t\t" << numbers[end_top_ind]  << endl;
-            cout << "начало среза\t" << beg_cut_ind << "\t\t" << numbers[beg_cut_ind] << endl;
+                cout << "выброс (макс)\t" << max_ind << "\t\t" << real_num[max_ind] << endl;
+            cout << "начало полки\t" << beg_top_ind << "\t\t" << real_num[beg_top_ind] << endl;
+            cout << "конец полки\t" << end_top_ind << "\t\t" << real_num[end_top_ind]  << endl;
+            cout << "начало среза\t" << beg_cut_ind << "\t\t" << real_num[beg_cut_ind] << endl;
+            cout << "конец среза\t" << end_cut_ind << "\t\t" << real_num[end_cut_ind] << endl;
             if (!blowout)
             {
                 cout << "выброс (мин)\t-"  << "\t\t   -" << endl;
-                cout << "конец среза\t" << end_cut_ind << "\t\t" << numbers[end_cut_ind] << endl;
             }
             else
-                cout << "выброс (мин)\t" << min_ind << "\t\t" << numbers[min_ind] << endl;
+                cout << "выброс (мин)\t" << min_ind << "\t\t" << real_num[min_ind] << endl;
             cout << endl;
-
 
 
 
@@ -635,6 +675,8 @@ int main(int argc, const char* argv[])
             string mach;
             mach = " *10^(-9) c";
 
+
+
             if (type == "-j")
             {
                 discr_per = discr_per * pow(10,0);
@@ -649,47 +691,70 @@ int main(int argc, const char* argv[])
                 discr_per = discr_per * pow(10, 2);
             }
 
-            //AUn = (Ua_num - num[Un]) / k;
-            //AU_n = num[U_n] ;
-
 
             cout << "\nвывод параметров:\n\n";
-            
-
-            // длительность фронта
-            while (numbers[r] < part_01)
-            {
-                r++;
-            }
-            while ((numbers[r] >= part_01) && (numbers[r] <= part_09) && (r < count - 1))
-            {
-                time_front = time_front + discr_per;
-                r++;
-            }
-            cout << "длительность фронта:\t"  << time_front << mach << endl;
 
 
-            // длительность среза
-            r = end_top_ind;
-            while (numbers[r] > part_09)
+
+            if (count == 200)
             {
-                r++;
+                // длительность фронта
+                for (r = beg_front_ind; r <end_front_ind; r++)
+                {
+
+                    time_front = time_front + discr_per;
+                }
+                cout << "длительность фронта:\t" << time_front << mach << endl;
+
+
+                for (r = beg_cut_ind; r < end_cut_ind; r++)
+                {
+
+                    time_cut = time_cut + discr_per;
+                }
+                cout << "длительность среза:\t" << time_cut << mach << endl;
             }
-            while ((numbers[r] >= part_01) && (numbers[r] <= part_09) && (r < count - 1))
+
+            else
             {
-                time_cut = time_cut + discr_per;
-                r++;
+                // длительность фронта
+                while (real_num[r] < part_01)
+                {
+                    r++;
+                }
+                while ((real_num[r] >= part_01) && (real_num[r] <= part_09) && (r < count - 1))
+                {
+                    time_front = time_front + discr_per;
+                    r++;
+                }
+                cout << "длительность фронта:\t" << time_front << mach << endl;
+
+
+                // длительность среза
+                r = end_top_ind;
+                while (real_num[r] > part_09)
+                {
+                    r++;
+                }
+                while ((real_num[r] >= part_01) && (real_num[r] <= part_09) && (r < count - 1))
+                {
+                    time_cut = time_cut + discr_per;
+                    r++;
+                }
+                cout << "длительность среза:\t" << time_cut << mach << endl;
             }
-            cout << "длительность среза:\t"  <<  time_cut << mach << endl;
+
+
+
 
 
             // длительность работы сигнала
             r = beg_front_ind;
-            while (numbers[r] < part_05)
+            while (real_num[r] < part_05)
             {
                 r++;
             }
-            while ((numbers[r] >= part_05) && (r < count - 1))
+            while ((real_num[r] >= part_05) && (r < count - 1))
             {
                 time_work = time_work + discr_per;
                 r++;
@@ -697,33 +762,41 @@ int main(int argc, const char* argv[])
             cout << "длительность работы сигнала:\t"  <<  time_work << mach << endl;
 
 
+            if (blowout)
+            {
+                // длительность выброса по переднему фронту
+                r = beg_front_ind;
+                while (real_num[r] < part_09)
+                {
+                    r++;
+                }
+                while ((r < beg_top_ind) && (r < count - 1))
+                {
+                    time_fr_out = time_fr_out + discr_per;
+                    r++;
+                }
+                cout << "длительность выброса по переднему фронту:   " << time_fr_out << mach << endl;
 
-            // длительность выброса по переднему фронту
-            r = beg_front_ind;
-            while (numbers[r] < part_09)
-            {
-                r++;
+                // длительность выброса по заднему фронту
+                r = beg_cut_ind;
+                while (real_num[r] > part_01)
+                {
+                    r++;
+                }
+                while ((r < beg_field) && (r < count - 1))
+                {
+                    time_cut_out = time_cut_out + discr_per;
+                    r++;
+                }
+                cout << "длительность выброса по заднему фронту:\t" << time_cut_out << mach << endl;
             }
-            while ((r < beg_top_ind) && (r < count - 1))
-            {
-                time_fr_out = time_fr_out + discr_per;
-                r++;
-            }
-            cout << "длительность выброса по переднему фронту:   " << time_fr_out << mach << endl;
 
-
-            // длительность выброса по заднему фронту
-            r = beg_cut_ind;
-            while (numbers[r] > part_01)
+            else
             {
-                r++;
+                cout << "*** нет выбросов ***\n";
+                cout << "длительность выброса по переднему фронту:   " << time_fr_out << mach << endl;
+                cout << "длительность выброса по заднему фронту:\t" << time_cut_out << mach << endl;
             }
-            while ((r < beg_field) && (r < count - 1))
-            {
-                time_cut_out = time_cut_out + discr_per;
-                r++;
-            }
-            cout << "длительность выброса по заднему фронту:\t" <<  time_cut_out << mach << endl;
 
 
 
@@ -731,49 +804,48 @@ int main(int argc, const char* argv[])
             if (blowout)
             {
                 //отрицательной
-                double U_n_min = numbers[max_ind];
+                double U_n_min = real_num[max_ind];
                 for (i = max_ind + 1; i < beg_top_ind; i++)
                 {
-                    if (numbers[i] < U_n_min)
+                    if (real_num[i] < U_n_min)
                     {
-                        U_n_min = numbers[i];
+                        U_n_min = real_num[i];
                         U_n = i;
                     }
                 }
 
                 // положительной
-                double Un_max = numbers[min_ind];
+                double Un_max = real_num[min_ind];
                 for (i = min_ind + 1; i < beg_field; i++)
                 {
-                    if (numbers[i] > Un_max)
+                    if (real_num[i] > Un_max)
                     {
-                        Un_max = numbers[i];
+                        Un_max = real_num[i];
                         Un = i;
                     }
                 }
-                cout << "амплитуда положительной помехи\nUn = " << numbers[Un] << "\t" 
-                     << "\nамплитуда отрицательной помехи\nU_n = " << numbers[U_n] << endl;
+                cout << "амплитуда положительной помехи\nUn = " << real_num[Un] << "\t" 
+                     << "\nамплитуда отрицательной помехи\nU_n = " << real_num[U_n] << endl;
             }
             else 
             {
-                cout << "there is no blowout\n";
-                cout << "амплитуда положительной помехи\nUn = " << numbers[Un] << "\t"
-                    << "амплитуда положительной помехи\nU_n = " << numbers[U_n] << endl;
+                cout << "амплитуда положительной помехи\nUn = " << 0 << "\t"
+                    << "\nамплитуда отрицательной помехи\nU_n = " << 0 << endl;
             }
 
 
-            double Ub01 = (numbers[max_ind] - Ua_num);                                  // амплитуда выброса по переднему фронту
-            double Ub10 = numbers[min_ind];                                             // амплитуда выброса по заднему фронту
+            double Ub01 = (real_num[max_ind] - Ua_num);                                  // амплитуда выброса по переднему фронту
+            double Ub10;
+            if (blowout)
+                 Ub10 = real_num[min_ind];                                              // амплитуда выброса по заднему фронту
+            else
+                 Ub10 = 0;
             cout << "амплитуда выброса по переднему фронту\nUb01 = " << Ub01 
                  << "\nамплитуда выброса по заднему фронту\nUb10 = " << Ub10 << endl;
 
 
         }
     }//end if
-
-
-
-
 
     return 0;
 }
